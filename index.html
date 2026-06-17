@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Watchlist</title>
+  <style>
+    :root {
+      --paper: #f7f6f1;
+      --ink: #171916;
+      --muted: #64675f;
+      --line: #c9cbc2;
+      --surface: #ffffff;
+      --accent: #c23b22;
+      --teal: #087f78;
+      --gold: #a16b00;
+      --blue: #2f64a3;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(rgba(23, 25, 22, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 25, 22, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 32px 32px;
+      font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+      line-height: 1.55;
+    }
+    a { color: inherit; }
+    .page-header {
+      border-top: 7px solid var(--accent);
+      border-bottom: 1px solid var(--line);
+      background: rgba(247, 246, 241, 0.94);
+    }
+    .header-inner, .controls, main { width: min(1440px, calc(100% - 40px)); margin: 0 auto; }
+    .header-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: end;
+      padding: 38px 0 30px;
+    }
+    .eyebrow { color: var(--accent); font-weight: 800; text-transform: uppercase; }
+    h1, h2 { font-family: "Yu Mincho", "Hiragino Mincho ProN", Georgia, serif; }
+    h1 { margin: 4px 0 0; font-size: clamp(2.4rem, 6vw, 5.4rem); line-height: 1; font-weight: 700; }
+    .summary { display: flex; gap: 24px; margin: 0; }
+    .summary div { min-width: 90px; border-left: 3px solid var(--ink); padding-left: 12px; }
+    .summary dt { color: var(--muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+    .summary dd { margin: 2px 0 0; font-family: Georgia, serif; font-size: 1.8rem; font-weight: 700; }
+    .control-band { position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.96); }
+    .controls { display: grid; grid-template-columns: minmax(220px, 2fr) repeat(4, minmax(125px, 1fr)); gap: 10px; padding: 14px 0; }
+    label { display: grid; gap: 4px; color: var(--muted); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
+    input, select {
+      width: 100%; min-height: 42px; border: 1px solid #aeb1a7; border-radius: 4px;
+      background: var(--surface); color: var(--ink); padding: 8px 10px; font: inherit;
+    }
+    input:focus, select:focus { outline: 3px solid rgba(8, 127, 120, 0.18); border-color: var(--teal); }
+    main { padding: 38px 0 80px; }
+    .result-line { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 26px; color: var(--muted); }
+    .watch-section { margin: 0 0 54px; scroll-margin-top: 110px; }
+    .watch-section[hidden] { display: none; }
+    .section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; border-bottom: 3px solid var(--ink); margin-bottom: 0; }
+    h2 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.5rem); }
+    .section-count { color: var(--muted); font-size: 0.82rem; font-weight: 700; }
+    .table-wrap { overflow-x: auto; background: var(--surface); border-bottom: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { padding: 13px 12px; border-bottom: 1px solid #e1e2dc; text-align: left; vertical-align: top; }
+    th { position: sticky; top: 71px; z-index: 2; background: #e9eae4; color: #484b45; font-size: 0.72rem; text-transform: uppercase; }
+    tbody tr { transition: background-color 140ms ease; }
+    tbody tr:hover { background: #f0f5f2; }
+    td:first-child { font-weight: 800; min-width: 210px; }
+    td:last-child { min-width: 280px; color: #4e514a; }
+    .entity, .priority { font-weight: 800; }
+    .entity-creator { color: var(--teal); }
+    .entity-work { color: var(--blue); }
+    .priority-s { color: var(--accent); }
+    .priority-a { color: var(--gold); }
+    .empty { display: none; padding: 70px 20px; text-align: center; color: var(--muted); }
+    .empty.visible { display: block; }
+    @media (max-width: 860px) {
+      .header-inner { grid-template-columns: 1fr; }
+      .summary { flex-wrap: wrap; }
+      .controls { grid-template-columns: 1fr 1fr; }
+      .controls label:first-child { grid-column: 1 / -1; }
+      th { top: 125px; }
+    }
+    @media (max-width: 620px) {
+      .header-inner, .controls, main { width: min(100% - 24px, 1440px); }
+      .header-inner { padding: 28px 0 22px; }
+      .summary { gap: 14px; }
+      .summary div { min-width: 74px; }
+      .controls { grid-template-columns: 1fr 1fr; padding: 10px 0; }
+      .table-wrap { overflow: visible; background: transparent; border: 0; }
+      table, thead, tbody, tr, td { display: block; min-width: 0; }
+      thead { display: none; }
+      tbody { display: grid; gap: 10px; padding-top: 10px; }
+      tbody tr { border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 4px; background: var(--surface); padding: 9px 12px; }
+      td { display: grid; grid-template-columns: 104px 1fr; gap: 10px; border: 0; padding: 5px 0; min-width: 0 !important; }
+      td::before { content: attr(data-label); color: var(--muted); font-size: 0.68rem; font-weight: 800; text-transform: uppercase; }
+      td:first-child { font-size: 1.08rem; }
+      .result-line { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <header class="page-header">
+    <div class="header-inner">
+      <div><div class="eyebrow">Personal Index</div><h1>Watchlist</h1></div>
+      <dl class="summary">
+        <div><dt>Total</dt><dd data-stat="total">42</dd></div>
+        <div><dt>Works</dt><dd data-stat="works">32</dd></div>
+        <div><dt>Creators</dt><dd data-stat="creators">10</dd></div>
+      </dl>
+    </div>
+  </header>
+  <div class="control-band">
+    <div class="controls">
+      <label>Search<input id="search" type="search" placeholder="タイトル・作者・メモを検索"></label>
+      <label>Category<select id="category"><option value="">All</option><option value="Anime">Anime</option><option value="Film">Film</option><option value="Manga">Manga</option><option value="Game">Game</option><option value="Music">Music</option><option value="Book">Book</option><option value="Other">Other</option></select></label>
+      <label>Entity<select id="entity"><option value="">All</option><option>Work</option><option>Creator</option></select></label>
+      <label>Status<select id="status"><option value="">All</option><option>unseen</option><option>exploring</option><option>in_progress</option><option>done</option><option>paused</option><option>dropped</option></select></label>
+      <label>Priority<select id="priority"><option value="">All</option><option>S</option><option>A</option><option>B</option><option>C</option></select></label>
+    </div>
+  </div>
+  <main>
+    <div class="result-line"><strong><span id="visible-count">42</span> entries shown</strong><span>Source: watchlist.md</span></div>
+    
+    <section class="watch-section" id="anime" data-section="Anime">
+      <div class="section-heading">
+        <h2>Anime</h2>
+        <span class="section-count" data-section-count>3 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Studio/Creator</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="serial experiments lain work yasuyuki ueda / ryutaro nakamura unseen s cyberpunk / network consciousness / internet ontology / late-90s digital anxiety" data-category="Anime" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">Serial Experiments Lain</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Studio/Creator">Yasuyuki Ueda / Ryutaro Nakamura</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">cyberpunk / network consciousness / internet ontology / late-90s digital anxiety</td></tr><tr data-search="お兄ちゃんはおしまい！ work studio bind unseen b gender transformation / slice of life / otaku culture" data-category="Anime" data-entity="Work" data-status="unseen" data-priority="B"><td data-label="Title">お兄ちゃんはおしまい！</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Studio/Creator">Studio Bind</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-b">B</td><td data-label="Notes">gender transformation / slice of life / otaku culture</td></tr><tr data-search="デジモンアドベンチャー work toei animation unseen a late-90s digital mythology / virtual worlds / children&#x27;s cyber adventure" data-category="Anime" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">デジモンアドベンチャー</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Studio/Creator">Toei Animation</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">late-90s digital mythology / virtual worlds / children&#x27;s cyber adventure</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="watch-section" id="film" data-section="Film">
+      <div class="section-heading">
+        <h2>Film</h2>
+        <span class="section-count" data-section-count>6 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Director</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="ウォン・カーウァイ creator wong kar-wai unseen a hong kong cinema / neon noir / melancholic urbanism" data-category="Film" data-entity="Creator" data-status="unseen" data-priority="A"><td data-label="Title">ウォン・カーウァイ</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Director">Wong Kar-wai</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">Hong Kong cinema / neon noir / melancholic urbanism</td></tr><tr data-search="マトリックス work lana wachowski, lilly wachowski unseen s cyberpunk / simulation theory / postmodern philosophy / virtual reality" data-category="Film" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">マトリックス</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Director">Lana Wachowski, Lilly Wachowski</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">cyberpunk / simulation theory / postmodern philosophy / virtual reality</td></tr><tr data-search="winny work 松本優作 unseen a film about isamu kaneko and the winny trial / japanese internet history / digital freedom" data-category="Film" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">Winny</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Director">松本優作</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">film about Isamu Kaneko and the Winny trial / Japanese internet history / digital freedom</td></tr><tr data-search="黒沢清 creator kiyoshi kurosawa unseen s cure / 回路 / j-horror / alienation / urban emptiness" data-category="Film" data-entity="Creator" data-status="unseen" data-priority="S"><td data-label="Title">黒沢清</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Director">Kiyoshi Kurosawa</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">Cure / 回路 / J-horror / alienation / urban emptiness</td></tr><tr data-search="クローネンバーグ creator david cronenberg unseen a body horror / techno-flesh / psychological mutation / canadian cinema" data-category="Film" data-entity="Creator" data-status="unseen" data-priority="A"><td data-label="Title">クローネンバーグ</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Director">David Cronenberg</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">body horror / techno-flesh / psychological mutation / Canadian cinema</td></tr><tr data-search="スコセッシ creator martin scorsese unseen a crime cinema / catholic guilt / american film history / restless editing" data-category="Film" data-entity="Creator" data-status="unseen" data-priority="A"><td data-label="Title">スコセッシ</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Director">Martin Scorsese</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">crime cinema / Catholic guilt / American film history / restless editing</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="watch-section" id="manga" data-section="Manga">
+      <div class="section-heading">
+        <h2>Manga</h2>
+        <span class="section-count" data-section-count>20 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Creator</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="藤田和日郎 creator 藤田和日郎 exploring a からくりサーカス / うしおとら" data-category="Manga" data-entity="Creator" data-status="exploring" data-priority="A"><td data-label="Title">藤田和日郎</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Creator">藤田和日郎</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">からくりサーカス / うしおとら</td></tr><tr data-search="遊☆戯☆王 work 高橋和希 unseen a card game manga / battle manga / egyptian mythology" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">遊☆戯☆王</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">高橋和希</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">card game manga / battle manga / Egyptian mythology</td></tr><tr data-search="喧嘩稼業 work 木多康昭 unseen s underground martial arts / strategy-heavy combat" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">喧嘩稼業</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">木多康昭</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">underground martial arts / strategy-heavy combat</td></tr><tr data-search="シグルイ work 山口貴由（原作：南條範夫） unseen s swordsmanship / grotesque realism / fatalism" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">シグルイ</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">山口貴由（原作：南條範夫）</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">swordsmanship / grotesque realism / fatalism</td></tr><tr data-search="スラムダンク work 井上雄彦 unseen s basketball manga / sports realism" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">スラムダンク</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">井上雄彦</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">basketball manga / sports realism</td></tr><tr data-search="ベルセルク work 三浦建太郎 unseen s dark fantasy / trauma / causality" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">ベルセルク</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">三浦建太郎</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">dark fantasy / trauma / causality</td></tr><tr data-search="寄生獣 work 岩明均 unseen s body horror / philosophical sf / ecological ethics" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">寄生獣</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">岩明均</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">body horror / philosophical SF / ecological ethics</td></tr><tr data-search="ヒストリエ work 岩明均 unseen a ancient greece / eumenes / historical narrative" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">ヒストリエ</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">岩明均</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">ancient Greece / Eumenes / historical narrative</td></tr><tr data-search="blame! work 弐瓶勉 unseen s megastructure / posthumanism / architectural sf" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">BLAME!</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">弐瓶勉</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">megastructure / posthumanism / architectural SF</td></tr><tr data-search="バイオメガ work 弐瓶勉 unseen a cyberpunk / infection / posthuman sf" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">バイオメガ</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">弐瓶勉</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">cyberpunk / infection / posthuman SF</td></tr><tr data-search="hellsing work 平野耕太 unseen a vampire action / occult war" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">HELLSING</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">平野耕太</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">vampire action / occult war</td></tr><tr data-search="ドリフターズ work 平野耕太 unseen a historical figures / war fantasy" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">ドリフターズ</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">平野耕太</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">historical figures / war fantasy</td></tr><tr data-search="機動警察パトレイバー work ゆうきまさみ / ヘッドギア unseen a near-future police mecha / labor politics" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">機動警察パトレイバー</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">ゆうきまさみ / ヘッドギア</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">near-future police mecha / labor politics</td></tr><tr data-search="へうげもの work 山田芳裕 unseen s tea ceremony / sengoku period / aesthetics and power / wabi-sabi" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">へうげもの</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">山田芳裕</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">tea ceremony / Sengoku period / aesthetics and power / wabi-sabi</td></tr><tr data-search="エイリアン9 work 富沢ひとし unseen s sf / body horror / alien symbiosis / anxiety" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">エイリアン9</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">富沢ひとし</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">SF / body horror / alien symbiosis / anxiety</td></tr><tr data-search="異世界おじさん work 殆ど死んでいる unseen a reverse-isekai comedy / sega nostalgia" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">異世界おじさん</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">殆ど死んでいる</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">reverse-isekai comedy / Sega nostalgia</td></tr><tr data-search="追放されたチート付与魔術師は気ままなセカンドライフを謳歌する。 work 六志麻あさ / 業務用餅 unseen a チー付与 / fantasy / upcoming anime" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">追放されたチート付与魔術師は気ままなセカンドライフを謳歌する。</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">六志麻あさ / 業務用餅</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">チー付与 / fantasy / upcoming anime</td></tr><tr data-search="masterキートン work 浦沢直樹（作画） / 勝鹿北星・長崎尚志（原作） unseen s archaeology / investigator / human drama" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">MASTERキートン</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">浦沢直樹（作画） / 勝鹿北星・長崎尚志（原作）</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">archaeology / investigator / human drama</td></tr><tr data-search="monster work 浦沢直樹 unseen s psychological thriller / identity / morality" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">MONSTER</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">浦沢直樹</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">psychological thriller / identity / morality</td></tr><tr data-search="餓狼伝（板垣版） work 板垣恵介（作画） / 夢枕獏（原作） unseen s martial arts epic / 丹波文七 / 格闘群像劇" data-category="Manga" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">餓狼伝（板垣版）</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Creator">板垣恵介（作画） / 夢枕獏（原作）</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">martial arts epic / 丹波文七 / 格闘群像劇</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="watch-section" id="game" data-section="Game">
+      <div class="section-heading">
+        <h2>Game</h2>
+        <span class="section-count" data-section-count>6 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Developer/Publisher</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="ブルーアーカイブ work nexon games / yostar unseen a academy setting / contemporary otaku culture" data-category="Game" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">ブルーアーカイブ</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Developer/Publisher">Nexon Games / Yostar</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">academy setting / contemporary otaku culture</td></tr><tr data-search="stellar blade work shift up unseen a korean action game / post-apocalyptic sf" data-category="Game" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">Stellar Blade</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Developer/Publisher">Shift Up</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">Korean action game / post-apocalyptic SF</td></tr><tr data-search="学園アイドルマスター work bandai namco entertainment exploring b idol training / media mix" data-category="Game" data-entity="Work" data-status="exploring" data-priority="B"><td data-label="Title">学園アイドルマスター</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Developer/Publisher">Bandai Namco Entertainment</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-b">B</td><td data-label="Notes">idol training / media mix</td></tr><tr data-search="終ノ空 work ケロq unseen s denpa / apocalypse / existential collapse" data-category="Game" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">終ノ空</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Developer/Publisher">ケロQ</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">denpa / apocalypse / existential collapse</td></tr><tr data-search="ペルソナ5 ザ・ロイヤル work atlus unseen s jungian psychology / social simulation" data-category="Game" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">ペルソナ5 ザ・ロイヤル</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Developer/Publisher">Atlus</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">Jungian psychology / social simulation</td></tr><tr data-search="ドラゴンクエストxi s work square enix unseen a traditional jrpg culmination" data-category="Game" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">ドラゴンクエストXI S</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Developer/Publisher">Square Enix</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">traditional JRPG culmination</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="watch-section" id="music" data-section="Music">
+      <div class="section-heading">
+        <h2>Music</h2>
+        <span class="section-count" data-section-count>3 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="宮野弦士 creator composer / arranger exploring a j-pop / idol / anime music composition" data-category="Music" data-entity="Creator" data-status="exploring" data-priority="A"><td data-label="Title">宮野弦士</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Type">Composer / Arranger</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">J-pop / idol / anime music composition</td></tr><tr data-search="鈴木俊介 creator composer / arranger exploring a j-pop / hello! project related composition and arrangement" data-category="Music" data-entity="Creator" data-status="exploring" data-priority="A"><td data-label="Title">鈴木俊介</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Type">Composer / Arranger</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">J-pop / Hello! Project related composition and arrangement</td></tr><tr data-search="テームインパラ creator kevin parker / tame impala exploring a psychedelic pop / synth rock / studio production" data-category="Music" data-entity="Creator" data-status="exploring" data-priority="A"><td data-label="Title">テームインパラ</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Type">Kevin Parker / Tame Impala</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">psychedelic pop / synth rock / studio production</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="watch-section" id="book" data-section="Book">
+      <div class="section-heading">
+        <h2>Book</h2>
+        <span class="section-count" data-section-count>3 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Author</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="同時代ゲーム work 大江健三郎 unseen a postwar japanese literature / mythology / political allegory" data-category="Book" data-entity="Work" data-status="unseen" data-priority="A"><td data-label="Title">同時代ゲーム</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Author">大江健三郎</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">postwar Japanese literature / mythology / political allegory</td></tr><tr data-search="百年の孤独 work gabriel garcía márquez unseen s magical realism / multigenerational narrative" data-category="Book" data-entity="Work" data-status="unseen" data-priority="S"><td data-label="Title">百年の孤独</td><td data-label="Entity Type" class="entity entity-work">Work</td><td data-label="Author">Gabriel García Márquez</td><td data-label="Status">unseen</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">magical realism / multigenerational narrative</td></tr><tr data-search="安部公房 creator 安部公房 exploring s surrealism / identity / alienation / existential fiction" data-category="Book" data-entity="Creator" data-status="exploring" data-priority="S"><td data-label="Title">安部公房</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Author">安部公房</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-s">S</td><td data-label="Notes">surrealism / identity / alienation / existential fiction</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="watch-section" id="other" data-section="Other">
+      <div class="section-heading">
+        <h2>Other</h2>
+        <span class="section-count" data-section-count>1 entries</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th scope="col">Title</th><th scope="col">Entity Type</th><th scope="col">Creator</th><th scope="col">Status</th><th scope="col">Priority</th><th scope="col">Notes</th></tr></thead>
+          <tbody><tr data-search="東浩紀 creator 東浩紀 exploring a postmodernism / otaku criticism / database consumption" data-category="Other" data-entity="Creator" data-status="exploring" data-priority="A"><td data-label="Title">東浩紀</td><td data-label="Entity Type" class="entity entity-creator">Creator</td><td data-label="Creator">東浩紀</td><td data-label="Status">exploring</td><td data-label="Priority" class="priority priority-a">A</td><td data-label="Notes">postmodernism / otaku criticism / database consumption</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+    <div id="empty" class="empty">条件に一致する項目はありません。</div>
+  </main>
+  <script>
+    const initialStats = {"total": 42, "creators": 10, "works": 32};
+    const controls = ["search", "category", "entity", "status", "priority"]
+      .map(id => document.getElementById(id));
+    const rows = [...document.querySelectorAll("tbody tr")];
+    const sections = [...document.querySelectorAll(".watch-section")];
+
+    function applyFilters() {
+      const [search, category, entity, status, priority] = controls.map(control => control.value.trim().toLowerCase());
+      let visible = 0;
+      for (const row of rows) {
+        const matches = (!search || row.dataset.search.includes(search))
+          && (!category || row.dataset.category.toLowerCase() === category)
+          && (!entity || row.dataset.entity.toLowerCase() === entity)
+          && (!status || row.dataset.status.toLowerCase() === status)
+          && (!priority || row.dataset.priority.toLowerCase() === priority);
+        row.hidden = !matches;
+        if (matches) visible += 1;
+      }
+      for (const section of sections) {
+        const count = [...section.querySelectorAll("tbody tr")].filter(row => !row.hidden).length;
+        section.hidden = count === 0;
+        section.querySelector("[data-section-count]").textContent = `${count} entries`;
+      }
+      document.getElementById("visible-count").textContent = visible;
+      document.getElementById("empty").classList.toggle("visible", visible === 0);
+    }
+    controls.forEach(control => control.addEventListener("input", applyFilters));
+    applyFilters();
+  </script>
+</body>
+</html>
