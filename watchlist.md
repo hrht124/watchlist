@@ -16,8 +16,8 @@
 | マトリックス | Work | Lana Wachowski, Lilly Wachowski | unseen | S | cyberpunk / simulation theory / postmodern philosophy / virtual reality |
 | Winny | Work | 松本優作 | unseen | A | film about Isamu Kaneko and the Winny trial / Japanese internet history / digital freedom |
 | 黒沢清 | Creator | Kiyoshi Kurosawa | unseen | S | Cure / 回路 / J-horror / alienation / urban emptiness |
-| クローネンバーグ | Creator | David Cronenberg | unseen | A | body horror / techno-flesh / psychological mutation / Canadian cinema |
-| スコセッシ | Creator | Martin Scorsese | unseen | A | crime cinema / Catholic guilt / American film history / restless editing |
+| デヴィッド・クローネンバーグ | Creator | David Paul Cronenberg | unseen | A | body horror / techno-flesh / psychological mutation / Canadian cinema |
+| マーティン・スコセッシ | Creator | Martin Charles Scorsese | unseen | A | crime cinema / Catholic guilt / American film history / restless editing |
 
 ## Manga
 
@@ -43,6 +43,7 @@
 | MASTERキートン | Work | 浦沢直樹（作画） / 勝鹿北星・長崎尚志（原作） | unseen | S | archaeology / investigator / human drama |
 | MONSTER | Work | 浦沢直樹 | unseen | S | psychological thriller / identity / morality |
 | 餓狼伝（板垣版） | Work | 板垣恵介（作画） / 夢枕獏（原作） | unseen | S | martial arts epic / 丹波文七 / 格闘群像劇 |
+| 神々の山嶺 | Work | 谷口ジロー（漫画） / 夢枕獏（原作） | unseen | S | mountaineering / Everest / obsession / human limits / literary manga |
 
 ## Game
 
