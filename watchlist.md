@@ -15,6 +15,7 @@
 | ウォン・カーウァイ | Creator | Wong Kar-wai | unseen | A | Hong Kong cinema / neon noir / melancholic urbanism |
 | マトリックス | Work | Lana Wachowski, Lilly Wachowski | unseen | S | cyberpunk / simulation theory / postmodern philosophy / virtual reality |
 | Winny | Work | 松本優作 | unseen | A | film about Isamu Kaneko and the Winny trial / Japanese internet history / digital freedom |
+| グリーンマイル | Work | Frank Darabont | unseen | A | prison drama / supernatural realism / Stephen King adaptation / death row |
 | 黒沢清 | Creator | Kiyoshi Kurosawa | unseen | S | Cure / 回路 / J-horror / alienation / urban emptiness |
 | デヴィッド・クローネンバーグ | Creator | David Paul Cronenberg | unseen | A | body horror / techno-flesh / psychological mutation / Canadian cinema |
 | マーティン・スコセッシ | Creator | Martin Charles Scorsese | unseen | A | crime cinema / Catholic guilt / American film history / restless editing |
