@@ -7,6 +7,7 @@
 | Serial Experiments Lain | Work | Yasuyuki Ueda / Ryutaro Nakamura | unseen | S | cyberpunk / network consciousness / internet ontology / late-90s digital anxiety |
 | お兄ちゃんはおしまい！ | Work | Studio Bind | unseen | B | gender transformation / slice of life / otaku culture |
 | デジモンアドベンチャー | Work | Toei Animation | unseen | A | late-90s digital mythology / virtual worlds / children's cyber adventure |
+| 涼宮ハルヒの憂鬱 | Work | 京都アニメーション | unseen | A | school SF / sekai-kei / otaku culture / late-2000s anime phenomenon |
 
 ## Film
 
